@@ -1,1 +1,125 @@
-print(" Ur Playing 3008 ")
+local ui = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local win = ui:CreateWindow({Name = "Nyx Hub | By theloststar0802",Icon = 0,LoadingTitle = "Loading",LoadingSubtitle = "",Theme = "Amethyst",DisableRayfieldPrompts = true,DisableBuildWarnings = true,ConfigurationSaving = {Enabled = true,FolderName = "Configs",FileName = "Default"},Discord = {Enabled = false,Invite = "noinvitelink",RememberJoins = true},KeySystem = false,KeySettings = {Title = "Untitled",Subtitle = "Key System",Note = "No method of obtaining the key is provided",FileName = "Key",SaveKey = true,GrabKeyFromSite = false,Key = {"Hello"}}})
+function notify(t,c,d)
+    ui:Notify({Title = "Nyx Hub Notify",Content = (t == "Error" and "Error "..c) or (t == "Warn" and "Warning "..c) or c,Duration = d or 8})
+end
+notify("","Welcome To Nyx Hub",8)
+local Tabs = {
+    ["Main Tab"] = win:CreateTab("Main Tab"),
+    info = win:CreateTab("Information Tab"),
+    
+}
+local Esp = {
+    Names = {Items = {},Employees = {}},
+    BillboardGuis = {Items = {},Employees = {},Players = {}},
+    
+}
+local Storage = {
+    
+}
+Tabs["Main Tab"]:CreateSection("Main Section")
+Tabs["Main Tab"]:CreateSlider({Name = "WalkSpeed",Range = {16,100},Increment = 1,Suffix = "",CurrentValue = 16,Flag = "WalkSpeed",Callback = function(v)
+    game:GetService("Players").LocalPlayer.Character.Humanoid.WalkSpeed = v
+end,})
+Tabs["Main Tab"]:CreateSlider({Name = "JumpPower",Range = {60,500},Increment = 1,Suffix = "",CurrentValue = 60,Flag = "JumpPower",Callback = function(v)
+    game:GetService("Players").LocalPlayer.Character.Humanoid.JumpPower = v
+end,})
+Tabs["Main Tab"]:CreateSection("Visuals Section")
+Tabs["Main Tab"]:CreateToggle({Name = "Entityes Esp",CurrentValue = false,Flag = "Entityes Esp",Callback = function(v)
+    if v then
+        for _,n in pairs(game:GetService("ReplicatedStorage").Employees:GetChildren()) do
+            table.insert(Esp.Names.Employees,n.Name)
+        end
+        local function bbg(obj)
+            if table.find(Esp.Names.Employees,obj.Name) then
+                local billboard = Instance.new("BillboardGui",obj)
+                table.insert(Esp.BillboardGuis.Employees,billboard)
+                local tl = Instance.new("TextLabel",billboard)
+                billboard.Size,billboard.AlwaysOnTop = UDim2.fromOffset(50,50),true
+                tl.Size,tl.BackgroundTransparency,tl.TextColor3,tl.Text = UDim2.fromScale(1,1),1,Color3.new(0.9,0,0),"[ "..obj.Name.." ]"
+            end
+        end
+        for _,obj in pairs(workspace.GameObjects.Physical.Employees:GetDescendants()) do
+            bbg(obj)
+        end
+    else
+        for _,bbg in pairs(Esp.BillboardGuis.Employees) do
+            if bbg and bbg.Parent then bbg:Destroy() end
+        end
+        Esp.BillboardGuis.Employees = {}
+    end
+end,})
+Tabs["Main Tab"]:CreateToggle({Name = "Items Esp",CurrentValue = false,Flag = "Items Esp",Callback = function(v)
+    if v then
+        for _,n in pairs(game:GetService("ReplicatedStorage").Modules.Item._EDIBLE:GetChildren()) do
+            if n:IsA("ModuleScript") or n:FindFirstChild("_NOTFOOD") or n:FindFirstChild("_VIP") then
+                table.insert(Esp.Names.Items,n.Name)
+            end
+        end
+        local function bbg(obj)
+            if table.find(Esp.Names.Items,obj.Name) then
+                local billboard = Instance.new("BillboardGui",obj)
+                table.insert(Esp.BillboardGuis.Items,billboard)
+                local tl = Instance.new("TextLabel",billboard)
+                billboard.Size,billboard.AlwaysOnTop = UDim2.fromOffset(50,50),true
+                tl.Size,tl.BackgroundTransparency,tl.TextColor3,tl.Text = UDim2.fromScale(1,1),1,Color3.fromRGB(224,17,95),"[ "..obj.Name.." ]"
+            end
+        end
+        for _,obj in pairs(workspace.GameObjects.Physical.Items:GetDescendants()) do
+            bbg(obj)
+        end
+        for _,obj in pairs(workspace.GameObjects.Physical.Map.Floor:GetDescendants()) do
+            if obj:FindFirstChild("Items") then
+                bbg(obj)
+            end
+        end
+    else
+        for _,bbg in pairs(Esp.BillboardGuis.Items) do
+            if bbg and bbg.Parent then bbg:Destroy() end
+        end
+        Esp.BillboardGuis.Items = {}
+    end
+end,})
+Tabs["Main Tab"]:CreateToggle({Name = "Players Esp",CurrentValue = false,Flag = "Players Esp",Callback = function(v)
+    local function bbg(plr)
+        if plr ~= game:GetService("Players").LocalPlayer and plr.Character and plr.Character:FindFirstChild("UpperTorso") then
+            if not Esp.BillboardGuis.Players[plr] then
+                local billboard = Instance.new("BillboardGui",plr.Character.UpperTorso)
+                local tl = Instance.new("TextLabel",billboard)
+                billboard.Size,billboard.AlwaysOnTop,billboard.StudsOffset = UDim2.fromOffset(50,50),true,Vector3.new(0,2,0)
+                tl.Size,tl.BackgroundTransparency,tl.TextColor3,tl.Text = UDim2.fromScale(1,1),1,Color3.new(0,0.9,0),"[ "..(plr.DisplayName or plr.Name).." ]"
+                Esp.BillboardGuis.Players[plr] = billboard
+            end
+        end
+    end
+    if v then
+        for _,plr in pairs(game:GetService("Players"):GetPlayers()) do
+            bbg(plr)
+        end
+        game:GetService("Players").PlayerAdded:Connect(function(plr)
+            plr.CharacterAdded:Connect(function()
+                bbg(plr)
+            end)
+        end)
+        game:GetService("Players").PlayerRemoving:Connect(function(plr)
+            if Esp.BillboardGuis.Players[plr] then
+                Esp.BillboardGuis.Players[plr]:Destroy()
+                Esp.BillboardGuis.Players[plr] = nil
+            end
+        end)
+    else
+        for plr,billboard in pairs(Esp.BillboardGuis.Players) do
+            if Esp.BillboardGuis.Players[plr] then
+                Esp.BillboardGuis.Players[plr]:Destroy()
+                Esp.BillboardGuis.Players[plr] = nil
+            end
+        end
+    end
+end,})
+Tabs["Main Tab"]:CreateSection("Antis Section")
+Tabs["Main Tab"]:CreateButton({Name = "No Fall Damage { not permanent just reset }",Callback = function()
+    repeat task.wait() until game:GetService("Players").LocalPlayer.Character:FindFirstChild("FallDamage")
+    game:GetService("Players").LocalPlayer.Character.FallDamage:Destroy()
+end,})
+Tabs.Info:CreateSection("Information Section")
+Tabs.Info:CreateParagraph({Title = "Information",Content = "IDK I WAS LAZY, SORRY IG? THERE'S NOTHING MUCH U CAN DO ONG"})
