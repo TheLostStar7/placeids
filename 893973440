@@ -1,0 +1,138 @@
+repeat task.wait() until game:IsLoaded()
+local ui = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local win = ui:CreateWindow({Name = "Nyx Hub | By theloststar0802",Icon = 0,LoadingTitle = "Loading",LoadingSubtitle = "",Theme = "Amethyst",DisableRayfieldPrompts = true,DisableBuildWarnings = true,ConfigurationSaving = {Enabled = true,FolderName = "Configs",FileName = "Default"},Discord = {Enabled = false,Invite = "noinvitelink",RememberJoins = true},KeySystem = false,KeySettings = {Title = "Untitled",Subtitle = "Key System",Note = "No method of obtaining the key is provided",FileName = "Key",SaveKey = true,GrabKeyFromSite = false,Key = {"Hello"}}})
+function notify(t,c,d)
+    ui:Notify({Title = "Nyx Hub Notify",Content = (t == "Error" and "Error "..c) or (t == "Warn" and "Warning "..c) or c,Duration = d or 8})
+end
+notify("","Welcome To Nyx Hub",8)
+local Tabs = {
+    ["Main Tab"] = win:CreateTab("Main Tab"),
+    Info = win:CreateTab("Information Tab"),
+    
+}
+local Connections = {
+  AntiSlow,
+  
+}
+local Toggles = {
+  Interact = false,
+  
+}
+local Storage = {
+  Crawling = 8,
+  Highlights = false,
+  BillboardGuis = false,
+  Lines = false,
+  
+}
+Tabs["Main Tab"]:CreateSection("Main Section")
+
+Tabs["Main Tab"]:CreateSection("Visuals Section")
+Tabs["Main Tab"]:CreateToggle({Name = "Highlights { colorful }",CurrentValue = false,Flag = "Computers Esp",Callback = function(v)
+  Storage.Highlights = v
+end,})
+Tabs["Main Tab"]:CreateToggle({Name = "BillboardGuis { names + distance }",CurrentValue = false,Flag = "Computers Esp",Callback = function(v)
+  Storage.BillboardGuis = v
+end,})
+Tabs["Main Tab"]:CreateToggle({Name = "Lines { From The Head }",CurrentValue = false,Flag = "Computers Esp",Callback = function(v)
+  Storage.Lines = v
+end,})
+Tabs["Main Tab"]:CreateToggle({Name = "Computers Esp",CurrentValue = false,Flag = "Computers Esp",Callback = function(v)
+  if v then
+    if Storage.Highlights then
+      for _,map in pairs(game:GetService("ReplicatedStorage").CurrentMap.Value:GetChildren()) do
+        if map:FindFirstChild("ComputerTable") then
+          if map.ComputerTable:FindFirstChild("Highlight") then map.ComputerTable.Highlight:Destroy() end
+          local hi = Instance.new("Highlight",map.ComputerTable)
+          hi.FillColor3,hi.OutlineTransparency,hi.FillTransparency,hi.Adornee = map.ComputerTable:FindFirstChild("Screen").Color,1,0.75,map.ComputerTable
+          map.ComputerTable:FindFirstChild("Screen").Changed:Connect(function()
+            hi.FillColor3 = map.ComputerTable.Screen.Color
+          end)
+        end
+      end
+    end
+  elseif Storage.BillboardGuis then
+    
+  elseif Storage.Lines then
+      
+  end
+end,})
+Tabs["Main Tab"]:CreateToggle({Name = "FreezePods Esp",CurrentValue = false,Flag = "FreezePods Esp",Callback = function(v)
+  
+end,})
+Tabs["Main Tab"]:CreateToggle({Name = "ExitDoor Esp",CurrentValue = false,Flag = "ExitDoor Esp",Callback = function(v)
+  
+end,})
+Tabs["Main Tab"]:CreateToggle({Name = "Vents Esp",CurrentValue = false,Flag = "Vents Esp",Callback = function(v)
+  
+end,})
+Tabs["Main Tab"]:CreateToggle({Name = "Players Esp",CurrentValue = false,Flag = "Players Esp",Callback = function(v)
+  
+end,})
+Tabs["Main Tab"]:CreateSection("LocalPlayer Section")
+Tabs["Main Tab"]:CreateToggle({Name = "Speed Boost",CurrentValue = false,Flag = "Speed Boost",Callback = function(v)
+  if v then
+    if game.Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid").WalkSpeed <= 20 then
+      game.Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid").WalkSpeed = 20
+    else
+      notify("Error","Your Speed Is Higher",8)
+    end
+  else
+    if game.Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid").WalkSpeed == 20 then
+      notify("Warning","Modifying Ur Speed",8)
+      game.Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid").WalkSpeed = 16
+    end
+  end
+end,})
+Tabs["Main Tab"]:CreateSlider({Name = "Crawling Speed",Range = {8,100},Increment = 1,Suffix = "",CurrentValue = 14,Flag = "Crawling Speed",Callback = function(v)
+  Storage.Crawling = v
+  game:GetService("Players").LocalPlayer.TempPlayerStatsModule.IsCrawling:GetPropertyChangedSignal("Value"):Connect(function()
+    if game:GetService("Players").LocalPlayer.TempPlayerStatsModule.IsCrawling.Value then
+      game:GetService("Players").LocalPlayer.Character:FindFirstChild("Humanoid").WalkSpeed = Storage.Crawling
+    end
+  end)
+end,})
+Tabs["Main Tab"]:CreateButton({Name = "No Fog",Callback = function()
+  if game:GetService("Lighting"):FindFirstChild("Atmosphere") then
+    game:GetService("Lighting").Atmosphere.Density = 0
+  end
+end,})
+Tabs["Main Tab"]:CreateInput({Name = "Field Of View",CurrentValue = "70",PlaceholderText = "",RemoveTextAfterFocusLost = true,Flag = "Field Of View",Callback = function(v)
+  workspace.CurrentCamera.FieldOfView = tonumber(v)
+end,})
+Tabs["Main Tab"]:CreateToggle({Name = "Instant Interact",CurrentValue = false,Flag = "Instant Interact",Callback = function(v)
+  Toggles.Interact = v
+  while Toggles.Interact do
+    game.Players.LocalPlayer.PlayerGui.ScreenGui.ActionBox:GetPropertyChangedSignal("Visible"):connect(function()
+      if v then
+        game.ReplicatedStorage.RemoteEvent:FireServer("Input","Action",true)
+      end
+    end)
+    task.wait()
+  end
+end,})
+Tabs["Main Tab"]:CreateSection("Beast Section")
+Tabs["Main Tab"]:CreateToggle({Name = "Hit Aura",CurrentValue = false,Flag = "Computer Esp",Callback = function(v)
+  
+end,})
+Tabs["Main Tab"]:CreateToggle({Name = "Rope Aura",CurrentValue = false,Flag = "Computer Esp",Callback = function(v)
+  
+end,})
+Tabs["Main Tab"]:CreateToggle({Name = "Anti Slow",CurrentValue = false,Flag = "Anti Slow",Callback = function(v)
+  if v then
+    Connections.AntiSlow = game:GetService("RunService").Heartbeat:Connect(function(c)
+      if game:GetService("Players").LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid").WalkSpeed <= 16 then
+        game:GetService("Players").LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid").WalkSpeed = 16
+      end
+    end)
+  else
+    if Connections.AntiSlow then
+      Connections.AntiSlow:Disconnect()
+      Connections.AntiSlow = false
+    end
+  end
+end,})
+Tabs["Main Tab"]:CreateSection("Troll Section")
+
+Tabs.Info:CreateSection("Information Section")
+Tabs.Info:CreateParagraph({Title = "Information",Content = 'once a legend said... "E"'})
