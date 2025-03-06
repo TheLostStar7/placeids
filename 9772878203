@@ -1,0 +1,169 @@
+local ui = loadstring(game:HttpGet('https://sirius.menu/rayfield'))() or loadstring(game:HttpGet('https://raw.githubusercontent.com/SiriusSoftwareLtd/Rayfield/ab965bf9a6f9890e6447c9b377678f5bffd8a379/source.lua'))()
+ui:Notify({Title = "Nyx Notify",Content = "Thanks For Using Nyx Hub",Duration = 10,})
+local win = ui:CreateWindow({Name = "Nyx Hub | Beta By theloststar0802",Icon = 0,LoadingTitle = "Loading",LoadingSubtitle = "",Theme = "Amethyst",DisableRayfieldPrompts = true,DisableBuildWarnings = true,ConfigurationSaving = {Enabled = true,FolderName = "Configs",FileName = "Default"},Discord = {Enabled = false,Invite = "noinvitelink",RememberJoins = true},KeySystem = false,KeySettings = {Title = "Untitled",Subtitle = "Key System",Note = "No method of obtaining the key is provided",FileName = "Key",SaveKey = true,GrabKeyFromSite = false,Key = {"Hello"}}})
+local Tabs = {
+  ["Main Tab"] = win:CreateTab("Main Tab"),
+  ["Plr Tab"] = win:CreateTab("Player Tab"),
+  ["Farm Tab"] = win:CreateTab("Farm Tab"),
+  
+}
+Tabs["Main Tab"]:CreateSection("Main Section")
+
+Tabs["Plr Tab"]:CreateSection("LocalPlayer Section")
+Tabs["Plr Tab"]:CreateSlider({Name = "Player Speed",Range = {16,100},Increment = 1,Suffix = "Speed",CurrentValue = 16,Flag = "Player Speed",Callback = function(v)
+  if _G.ws then _G.ws:Disconnect() end
+  _G.ws = game:GetService("RunService").Heartbeat:Connect(function()
+    if game:GetService("Players").LocalPlayer.Character then
+      game:GetService("Players").LocalPlayer.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = v
+    end
+  end)
+end,})
+Tabs["Plr Tab"]:CreateSlider({Name = "Player Jump",Range = {60,375},Increment = 1,Suffix = "Power",CurrentValue = 60,Flag = "Player Jump",Callback = function(v)
+  if _G.jp then _G.jp:Disconnect() end
+  _G.jp = game:GetService("RunService").Heartbeat:Connect(function()
+    if game:GetService("Players").LocalPlayer.Character then
+      game:GetService("Players").LocalPlayer.Character:FindFirstChildOfClass("Humanoid").JumpPower = v
+    end
+  end)
+end,})
+Tabs["Farm Tab"]:CreateSection("Farm Section")
+local queue = {}
+local function teleport(t,c)
+  table.insert(queue,{t,c})
+  if #queue == 1 then
+    while #queue > 0 do
+      if game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        local d = (typeof(queue[1][1]) == "CFrame" and queue[1][1].Position or typeof(queue[1][1]) == "Vector3" and queue[1][1] or queue[1][1].WorldPivot and queue[1][1].WorldPivot.Position or queue[1][1]:GetPivot().Position)-game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Position
+        game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Position+d.Unit*math.min(23,d.Magnitude)+Vector3.new(0,d.Y,0))
+      end
+      table.remove(queue,1)
+    end
+  end
+end
+_G.Collect=
+Tabs["Farm Tab"]:CreateToggle({Name = "Auto Collect",CurrentValue = false,Flag = "Auto Collect",Callback = function(v)
+  if v then
+    _G.Collect = game:GetService("RunService").Stepped:Connect(function()
+      for _,v in next,workspace:GetChildren() do
+        if v.Name == "Money" or v.Name == "Money Bag" or v.Name == "Rent" then
+          firetouchinterest(v,game:GetService("Players").LocalPlayer.Character.HumanoidRootPart,0)
+        end
+      end
+    end)
+  else
+    _G.Collect:Disconnect()
+  end
+end,})
+_G.Tigger=
+Tabs["Farm Tab"]:CreateToggle({Name = "Auto Click",CurrentValue = false,Flag = "Auto Click",Callback = function(v)
+  if v then
+    _G.Tigger = game:GetService("RunService").Stepped:Connect(function()
+      for _,v in next,workspace:GetChildren() do
+        if v:FindFirstChild("ClickDetector") then
+          fireclickdetector(v.ClickDetector)
+        end
+      end
+      for _,v_ in next,workspace.Unlocks:GetChildren() do
+        if v_:FindFirstChild("ClickDetector") and v_.ClickDetector.Parent.Name == "Baby Floppa" then
+          fireclickdetector(v_.ClickDetector)
+        end
+      end
+    end)
+  else
+    _G.Tigger:Disconnect()
+  end
+end,})
+_G.Pet = false
+Tabs["Farm Tab"]:CreateToggle({Name = "Auto Pet",CurrentValue = false,Flag = "Auto Feed",Callback = function(v)
+  _G.Pet = v
+  _G.Ready = false
+  while _G.Pet do
+    if workspace.Floppa.Configuration.Happiness.Value <= 35.99 then
+      _G.Ready = true
+    end
+    if _G.Ready then
+      teleport(workspace.Floppa.HumanoidRootPart.CFrame,4)
+      fireproximityprompt(workspace.Floppa.HumanoidRootPart.ProximityPrompt)
+      _G.Ready = false
+    end
+    task.wait()
+  end
+end,})
+_G.Feed = false
+Tabs["Farm Tab"]:CreateToggle({Name = "Auto Feed",CurrentValue = false,Flag = "Auto Feed",Callback = function(v)
+  _G.Feed = v
+  _G.Ready = false
+  while _G.Feed do
+    if workspace.Floppa.Configuration.Hunger.Value <= 5 and workspace["Key Parts"].Bowl.Part.Transparency >= 0 then
+      _G.Ready = true
+      break
+    end
+    task.wait()
+  end
+  if _G.Ready then
+    teleport(workspace["Key Parts"].Bowl.Part.CFrame,2)
+    repeat wait(1.48) game.ReplicatedStorage.Events.Unlock:FireServer("Floppa Food","the_interwebs") until game:GetService("Players").LocalPlayer.Character:FindFirstChild("Floppa Food")
+    fireproximityprompt(workspace["Key Parts"].Bowl.Part.ProximityPrompt,0)
+    _G.Ready = false
+  end
+end,})
+_G.Clean = false
+Tabs["Farm Tab"]:CreateToggle({Name = "Auto Clean [ NEEDS FIXING ]",CurrentValue = false,Flag = "Auto Clean",Callback = function(v)
+  _G.Clean = v
+  _G.Ready = false
+  while _G.Clean do
+    for _,v in next,workspace:GetChildren() do
+      if v.Name == "Poop" then
+        teleport(v:GetPivot().Position,3)
+        task.wait(0.2)
+        fireproximityprompt(v.ProximityPrompt,0)
+        task.wait(0.05)
+        _G.Ready = true
+      end
+    end
+    for _,v in next,workspace["Key Parts"]["Litter Box"]:GetChildren() do
+      if v.Name == "Poop" then
+        teleport(v:GetPivot().Position,3)
+        task.wait(0.2)
+        fireproximityprompt(v.ProximityPrompt,0)
+        task.wait(0.05)
+        _G.Ready = true
+      end
+    end
+    if _G.Ready then
+      game:GetService("Players").LocalPlayer.Character.Humanoid.Sit = false
+      _G.Ready = false
+    end
+    task.wait()
+  end
+end,})
+_G.Save = false
+Tabs["Farm Tab"]:CreateToggle({Name = "Auto Save",CurrentValue = false,Flag = "Auto Save",Callback = function(v)
+  _G.Save = v
+  while _G.Save do
+    game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Save"):FireServer()
+    task.wait()
+  end
+end,})
+_G.Present = false
+Tabs["Farm Tab"]:CreateToggle({Name = "Auto Collect Present",CurrentValue = false,Flag = "Auto Collect Present",Callback = function(v)
+  _G.Present = v
+  while _G.Present do
+    if workspace.Presents:FindFirstChild("Present") then
+      teleport(workspace.Presents.Present.CFrame,5)
+      fireproximityprompt(workspace.Presents.Present.ProximityPrompt)
+    end
+    task.wait()
+  end
+end,})
+_G.Seed = false
+Tabs["Farm Tab"]:CreateToggle({Name = "Auto Collect Seeds",CurrentValue = false,Flag = "Auto Collect Seeds",Callback = function(v)
+  _G.Seed = v
+  while _G.Seed do
+    if workspace.Seeds:FindFirstChild("Seed") then
+      teleport(workspace.Seeds.Seed.CFrame,6)
+      fireproximityprompt(workspace.Seeds.Seed.ProximityPrompt)
+    end
+    task.wait()
+  end
+end,})
