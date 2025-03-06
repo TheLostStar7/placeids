@@ -102,7 +102,7 @@ Tabs["Farm Tab"]:CreateToggle({Name = "Auto Feed",CurrentValue = false,Flag = "A
   end
   if _G.Ready then
     teleport(workspace["Key Parts"].Bowl.Part.CFrame,2)
-    repeat wait(1.48) game.ReplicatedStorage.Events.Unlock:FireServer("Floppa Food","the_interwebs") until game:GetService("Players").LocalPlayer.Character:FindFirstChild("Floppa Food")
+    repeat task.wait(0.2) game.ReplicatedStorage.Events.Unlock:FireServer("Floppa Food","the_interwebs") until game:GetService("Players").LocalPlayer.Character:FindFirstChild("Floppa Food")
     fireproximityprompt(workspace["Key Parts"].Bowl.Part.ProximityPrompt,0)
     _G.Ready = false
   end
