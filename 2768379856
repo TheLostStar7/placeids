@@ -83,12 +83,12 @@ Tabs["Main Tab"]:CreateToggle({Name = "Items Esp",CurrentValue = false,Flag = "I
 end,})
 Tabs["Main Tab"]:CreateToggle({Name = "Players Esp",CurrentValue = false,Flag = "Players Esp",Callback = function(v)
     local function bbg(plr)
-        if plr ~= game:GetService("Players").LocalPlayer and plr.Character and plr.Character:FindFirstChild("UpperTorso") then
+        if plr ~= game:GetService("Players").LocalPlayer and plr.Character:FindFirstChild("Humanoid").Health > 0 then
             if not Esp.BillboardGuis.Players[plr] then
-                local billboard = Instance.new("BillboardGui",plr.Character.UpperTorso)
+                local billboard = Instance.new("BillboardGui",plr)
                 local tl = Instance.new("TextLabel",billboard)
-                billboard.Size,billboard.AlwaysOnTop,billboard.StudsOffset = UDim2.fromOffset(50,50),true,Vector3.new(0,2,0)
-                tl.Size,tl.BackgroundTransparency,tl.TextColor3,tl.Text = UDim2.fromScale(1,1),1,Color3.new(0,0.9,0),"[ "..(plr.DisplayName or plr.Name).." ]"
+                billboard.Size,billboard.AlwaysOnTop,billboard.StudsOffset = UDim2.fromOffset(50,50),true,Vector3.new(0,2.3,0)
+                tl.Size,tl.BackgroundTransparency,tl.TextColor3,tl.Text = UDim2.fromScale(1,1),1,Color3.new(0,0.9,0),"[ "..plr.Name.." | " ..plr.DisplayName.." ]"
                 Esp.BillboardGuis.Players[plr] = billboard
             end
         end
