@@ -226,10 +226,6 @@ Tabs["Main Tab"]:CreateToggle({Name = "Auto Click Tycoon",CurrentValue = false,F
         end
     end
 end,})
-Tabs["Main Tab"]:CreateButton({Name = "Boxer Slap Farmer {DonjoScripts} [Fast]",Callback = function()
-    DurationTimeSHOP = math.huge
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/DonjoScripts/Public-Scripts/refs/heads/Slap-Battles/Boxer-slap-farm"))()
-end,})
 Tabs["Main Tab"]:CreateSection("Troll Section")
 Tabs["Main Tab"]:CreateToggle({Name = "Stun Aura",CurrentValue = false,Flag = "Stun Aura",Callback = function(c)
     if game:GetService("Players").LocalPlayer.leaderstats.Glove.Value == "Untitled Tag Glove" then
