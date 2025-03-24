@@ -1,0 +1,101 @@
+local ui = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local win = ui:CreateWindow({Name = "Nyx Hub | By Team Nyx",Icon = 0,LoadingTitle = "Loading",LoadingSubtitle = "",Theme = "Amethyst",DisableRayfieldPrompts = true,DisableBuildWarnings = true,ConfigurationSaving = {Enabled = true,FolderName = "Configs",FileName = "Default"},Discord = {Enabled = false,Invite = "noinvitelink",RememberJoins = true},KeySystem = false,KeySettings = {Title = "Untitled",Subtitle = "Key System",Note = "No method of obtaining the key is provided",FileName = "Key",SaveKey = true,GrabKeyFromSite = false,Key = {"Hello"}}})
+function notify(title,context,duration)
+  ui:Notify({Title = (title and title ~= "") and title or "Nyx Notify",Content = (context and context ~= "") and context or "No Context",Duration = duration or 3})
+end
+local Tabs = {
+  ["Main Tab"] = win:CreateTab("Main Tab"),
+  ["Farm Tab"] = win:CreateTab("Farm Tab"),
+  ["Players Tab"] = win:CreateTab("Players Tab"),
+  ["Misc Tab"] = win:CreateTab("Misc Tab"),
+  ["Change Log"] = win:CreateTab("Change Log"),
+  ["Credit Tab"] = win:CreateTab("Credit Tab"),
+}
+local rs,char = game:GetService("RunService"),game:GetService("Players").LocalPlayer.Character
+local locals = {
+  coin = false,
+  
+}
+local connections = {
+  coins,
+  upgrade,
+  
+}
+Tabs["Main Tab"]:CreateSection("Main Section")
+Tabs["Main Tab"]:CreateButton({Name = "Unlock All The Islands",Callback = function()
+  for _,island in ipairs(workspace.Islands:GetChildren()) do
+    char.HumanoidRootPart.CFrame = CFrame.new(0,10,0)*island:FindFirstChild("IqCapsule"):GetPivot()
+    task.wait(1)
+  end
+  char.HumanoidRootPart.CFrame = CFrame.new(game:GetService("Workspace").SpawnLocation.Position)
+  notify("","Unlocking All The Islands",5)
+end,})
+Tabs["Main Tab"]:CreateButton({Name = "Open The Shop",Callback = function()
+  firetouchinterest(workspace.BuyPart,char.HumanoidRootPart,0)
+  notify("","Opened The Shop",5)
+end,})
+Tabs["Players Tab"]:CreateSection("LocalPlayer Section")
+Tabs["Players Tab"]:CreateSlider({Name = "WalkSpeed",Range = {16,150},Increment = 3,Suffix = "Speed",CurrentValue = 16,Flag = "WalkSpeed",Callback = function(v)
+  game:GetService("RunService").Heartbeat:Connect(function()
+    char.Humanoid.WalkSpeed = v
+  end)
+end,})
+Tabs["Players Tab"]:CreateSlider({Name = "JumpPower",Range = {60,562},Increment = 3,Suffix = "Jump",CurrentValue = 60,Flag = "JumpPower",Callback = function(v)
+  game:GetService("RunService").Heartbeat:Connect(function()
+    char.Humanoid.JumpPower = v
+  end)
+end,})
+Tabs["Farm Tab"]:CreateSection("Farm Section")
+Tabs["Farm Tab"]:CreateToggle({Name = "Farm Coins",CurrentValue = false,Flag = "Farm Coins",Callback = function(v)
+  if v then
+    notify("","Collecting The Coins",5)
+    connections.coins = rs.Stepped:Connect(function()
+      for _,coin in pairs(workspace.Coins:GetChildren()) do
+        if coin:FindFirstChild("Coin") then
+          firetouchinterest(coin.Coin,char.HumanoidRootPart,0)
+        end
+      end
+      task.wait()
+    end)
+  else
+    connections.coins:Disconnect()
+    connections.coins = nil
+    notify("","Stopped Collecting The Coins",5)
+  end
+end,})
+Tabs["Farm Tab"]:CreateToggle({Name = "Upgrade Brain Capacity",CurrentValue = false,Flag = "Upgrade Brain Capacity",Callback = function(v)
+  if v then
+    connections.upgrade = rs.RenderStepped:Connect(function()
+      if game:GetService("Players").LocalPlayer.leaderstats.Coins.Value >= tonumber(game:GetService("Players").LocalPlayer.PlayerGui.MainGui.UpgradeWindow.PriceContainer.Price.Text) then
+        game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("UpgradeCapacity"):FireServer()
+      end
+    end)
+  else
+    connections.upgrade:Disconnect()
+    connections.upgrade = nil
+  end
+end,})
+Tabs["Misc Tab"]:CreateSection("Misc Section")
+Tabs["Misc Tab"]:CreateButton({Name = "Anti-Afk",Callback = function()
+  game:GetService("Players").LocalPlayer.Idled:Connect(function()
+    game:GetService("VirtualUser"):Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+    task.wait(1)
+    game:GetService("VirtualUser"):Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+  end)
+  notify("","The Only Way To Turn This Off Is By Rejoining Or Leaving",5)
+end,})
+Tabs["Misc Tab"]:CreateButton({Name = "Balloon [NOT FE]",Callback = function()
+  local balloon = game:GetService("ReplicatedStorage").Tools.Balloon:Clone()
+  balloon:FindFirstChild("VectorForce").Force = Vector3.new(0,200,0)
+  balloon.Parent = game:GetService("Players").LocalPlayer.Backpack
+end,})
+Tabs["Misc Tab"]:CreateButton({Name = "Capsule Collecter",Callback = function()
+  for _,island in ipairs(workspace.Islands:GetChildren()) do
+    if island:FindFirstChild("IqCapsule") and island.IqCapsule:FindFirstChild("CollectPart") then
+      firetouchinterest(island.IqCapsule.CollectPart,char.HumanoidRootPart,0)
+      firetouchinterest(island.IqCapsule.CollectPart,char.HumanoidRootPart,1)
+    end
+  end
+end,})
+Tabs["Credit Tab"]:CreateSection("Credits Section")
+Tabs["Credit Tab"]:CreateParagraph({Title = "The Credits",Content = "Credits To imjustynlol For The Source And theloststar0802 For The Rework And Improvements"})
