@@ -1,0 +1,125 @@
+local ui = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local win = ui:CreateWindow({Name = "Nyx Hub | By Team Nyx",Icon = 0,LoadingTitle = "Loading",LoadingSubtitle = "",Theme = "Amethyst",DisableRayfieldPrompts = true,DisableBuildWarnings = true,ConfigurationSaving = {Enabled = true,FolderName = "Configs",FileName = "Default"},Discord = {Enabled = false,Invite = "noinvitelink",RememberJoins = true},KeySystem = false,KeySettings = {Title = "Untitled",Subtitle = "Key System",Note = "No method of obtaining the key is provided",FileName = "Key",SaveKey = true,GrabKeyFromSite = false,Key = {"Hello"}}})
+function notify(title,context,duration)
+  ui:Notify({Title = (title and title ~= "") and title or "Nyx Notify",Content = (context and context ~= "") and context or "No Context",Duration = duration or 3})
+end
+local Tabs = {
+  ["Farm Tab"] = win:CreateTab("Farm Tab"),
+  ["Players Tab"] = win:CreateTab("Players Tab"),
+  ["Change Log"] = win:CreateTab("Change Log"),
+  ["Credit Tab"] = win:CreateTab("Credit Tab"),
+}
+local rs,char = game:GetService("RunService"),game:GetService("Players").LocalPlayer.Character
+local locals = {
+  hoops = false,
+  ramps = false,
+  race = false,
+  
+}
+local connections = {
+  orbs,
+  
+}
+Tabs["Players Tab"]:CreateSection("LocalPlayer Section")
+Tabs["Players Tab"]:CreateSlider({Name = "WalkSpeed",Range = {16,150},Increment = 3,Suffix = "Speed",CurrentValue = 16,Flag = "WalkSpeed",Callback = function(v)
+  game:GetService("RunService").Heartbeat:Connect(function()
+    char.Humanoid.WalkSpeed = v
+  end)
+  notify("","WalkSpeed: "..v,1)
+end,})
+Tabs["Players Tab"]:CreateSlider({Name = "JumpPower",Range = {60,562},Increment = 3,Suffix = "Jump",CurrentValue = 60,Flag = "JumpPower",Callback = function(v)
+  game:GetService("RunService").Heartbeat:Connect(function()
+    char.Humanoid.JumpPower = v
+  end)
+  notify("","JumpPower: "..v,1)
+end,})
+Tabs["Farm Tab"]:CreateSection("Farm Section")
+Tabs["Farm Tab"]:CreateToggle({Name = "Orbs Collector {TOO FAST FOR GAME UPDATES}",CurrentValue = false,Flag = "Orbs Collector {TOO FAST FOR GAME UPDATES}",Callback = function(v)
+  locals.orbs = v
+  if v then
+    if connections.orbs then connections.orbs:Disconnect() connections.orbs = nil end
+    local orbs = {}
+    for _,orb in pairs(game:GetService("ReplicatedStorage"):WaitForChild("Orbs"):GetChildren()) do
+      table.insert(orbs,orb.Name)
+    end
+    connections.orbs = rs.Stepped:Connect(function()
+      if not locals.orbs then
+        if connections.orbs then connections.orbs:Disconnect() connections.orbs = nil end
+        return
+      end
+      for _,worlds in pairs(workspace.orbFolder:GetChildren()) do
+        for _,orb in pairs(orbs) do
+          game:GetService("ReplicatedStorage"):WaitForChild("rEvents"):WaitForChild("orbEvent"):FireServer("collectOrb",orb,worlds.Name)
+        end
+      end
+    end)
+    notify("","The Orb Collector Is On",3)
+  else
+    if connections.orbs then connections.orbs:Disconnect() connections.orbs = nil end
+    notify("","The Orb Collector Is Off",3)
+  end
+end,})
+Tabs["Farm Tab"]:CreateToggle({Name = "Hoops Collector",CurrentValue = false,Flag = "Hoops Collector",Callback = function(v)
+  locals.hoops = v
+  if v then
+    task.spawn(function()
+      while locals.hoops and task.wait() do
+        for _,v in pairs(workspace.Hoops:GetChildren()) do
+          firetouchinterest(v,char.HumanoidRootPart,0)
+        end
+      end
+    end)
+    notify("","The Hoops Collector Is On",3)
+  else
+    notify("","The Hoops Collector Is Off",3)
+  end
+end,})
+Tabs["Farm Tab"]:CreateToggle({Name = "Use Ramps",CurrentValue = false,Flag = "Use Ramps",Callback = function(v)
+  locals.ramps = v
+  if v then
+    task.spawn(function()
+      while locals.ramps and task.wait() do
+        game:GetService("ReplicatedStorage").rEvents.speedRampEvent:FireServer("usedRamp")
+      end
+    end)
+    notify("","The Ramp User Is On",3)
+  else
+    notify("","The Ramp User Is Off",3)
+  end
+end})
+Tabs["Farm Tab"]:CreateToggle({Name = "Farm Races",CurrentValue = false,Flag = "Farm Races",Callback = function(v)
+  locals.race = v
+  task.spawn(function()
+    while locals.race do
+      if game:GetService("Players").LocalPlayer.PlayerGui.gameGui.raceJoinLabel.Visible then
+        game:GetService("ReplicatedStorage").rEvents.raceEvent:FireServer("joinRace")
+        repeat task.wait() until game:GetService("Players").LocalPlayer.PlayerGui.gameGui.countdownLabels.goLabel.Visible or not locals.race
+        if not locals.race then break end
+        for _,race in pairs(game:GetService("Workspace").raceMaps:GetChildren()) do
+          if game:GetService("Players").LocalPlayer.currentMap.Value == race.mapValue.Value then
+            if game:GetService("Players").LocalPlayer.Character and game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and race:FindFirstChild("finishPart") then
+              game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = race.finishPart.CFrame
+            end
+          end
+        end
+      end
+      task.wait()
+    end
+  end)
+end,})
+Tabs["Farm Tab"]:CreateToggle({Name = "Auto Rebirth",CurrentValue = false,Flag = "Auto Rebirth",Callback = function(v)
+  while v and task.wait() do
+    if game:GetService("Players").LocalPlayer.PlayerGui.gameGui.statsFrame.levelLabel.maxLabel.Visible then game:GetService("ReplicatedStorage").rEvents.rebirthEvent:FireServer("rebirthRequest") end
+    if not v then break end
+  end
+end,})
+Tabs["Farm Tab"]:CreateToggle({Name = "Auto Claim Daily Rewards",CurrentValue = false,Flag = "Auto Claim Daily Rewards",Callback = function(v)
+  while v and task.wait() do
+    for i=1,8 do game:GetService("ReplicatedStorage").rEvents.freeGiftClaimRemote:InvokeServer("claimGift",i) end
+    if not v then break end
+  end
+end,})
+Tabs["Change Log"]:CreateSection("Information Section")
+Tabs["Change Log"]:CreateParagraph({Title = "Information",Content = "I Felt Bored. So I Updated My Script Hub."})
+Tabs["Credit Tab"]:CreateSection("Credit Section")
+Tabs["Credit Tab"]:CreateParagraph({Title = "Credits",Content = "Credits To The Lost Star. We Need More Devs."})
